@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Book List</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Vue.js -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- style css  -->
+    <style>
+      .less {
+        background-color: red;
+      }
+      .more {
+        background-color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Navbar -->
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Book Store</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">Home</a>
+              </li>
+              <li class="nav-item">
+                <button class="btn btn-light" @click="toggleWishlist">
+                  {{ showWishlist ? 'Back to Book List' : 'Check List' }}
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Book List -->
+      <div v-if="!showWishlist">
+        <h1 class="text-center my-4">Book List</h1>
+        <ul class="container row justify-content-center text-light">
+          <li class="col-md-3 bg-light list-unstyled m-2 mb-2" v-for="book in books" :key="book.ISBN" :title="book.author">
+            <p class="fs-3 lead text-center">{{ book.Name }}</p>
+            <img class="w-100" :src="book.Image" alt="">
+            <div class="d-flex justify-content-evenly mt-2">
+              <p class="f2-1.3 bg-primary rounded-2 p-1 text-center">{{ book.Category }}</p>
+              <p class="f2-1.3 bg-primary rounded-2 p-1 text-center">{{ book.author }}</p>
+            </div>
+
+            <div class="d-flex justify-content-evenly">
+              <p :class="['f2-1.3', 'rounded-2', 'p-1', 'text-center', 'w-25', book.pages < 50 ? 'less' : 'more']">
+                #{{ book.pages }}
+              </p>
+              <p class="f2-1.3 bg-primary rounded-2 p-1 text-center w-25">{{ formatPrice(book.price) }}</p>
+            </div>
+            <div class="d-flex justify-content-evenly">
+              <p class="f2-1.3 bg-primary rounded-2 p-1 text-center w-25">{{ book.ISBN }}</p>
+              <button class="f2-1.3 bg-primary rounded-2 p-1 text-center text-light" @click="addToWishlist(book)">
+                Add To List
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Wishlist -->
+      <div v-else>
+        <h1 class="text-center my-4">Wishlist</h1>
+        <div v-if="wishlist.length === 0" class="text-center">
+          <p class="text-danger fs-5">Your wishlist is empty.</p>
+        </div>
+        <div v-else class="container">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Author</th>
+                <th>Price</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(book, index) in wishlist" :key="book.ISBN">
+                <td>{{ book.Name }}</td>
+                <td>{{ book.author }}</td>
+                <td>{{ formatPrice(book.price) }}</td>
+                <td>
+                  <button @click="removeFromWishlist(index)" class="btn btn-danger">Remove</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script src="./books.js"></script>
+    <script>
+      const app = Vue.createApp({
+        data() {
+          return {
+            books: books,
+            wishlist: [],
+            showWishlist: false
+          };
+        },
+        methods: {
+          addToWishlist(book) {
+            if (!this.wishlist.some(b => b.ISBN === book.ISBN)) {
+              this.wishlist.push(book);
+            }
+          },
+          removeFromWishlist(index) {
+            this.wishlist.splice(index, 1);
+          },
+          toggleWishlist() {
+            this.showWishlist = !this.showWishlist;
+          },
+          formatPrice(price) {
+            return new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(price);
+          }
+        }
+      });
+
+      app.mount("#app");
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  </body>
+</html>
